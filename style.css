@@ -1,6 +1,6 @@
   :root{
-    --ink:#141210;
-    --ink-soft:#1e1a14;
+    --ink:#000000;
+    --ink-soft:#000000;
     --cream:#efe7d8;
     --cream-dim:#e2d8c3;
     --red:#f0110d;
@@ -125,9 +125,7 @@
   .hero::before{
     content:'';
     position:absolute; inset:0;
-    background-image:
-      radial-gradient(circle at 85% 15%, rgba(192,138,62,0.16), transparent 55%),
-      radial-gradient(circle at 5% 90%, rgba(167,42,42,0.18), transparent 50%);
+    background:#000;
     pointer-events:none;
   }
   .hero-grid{
