@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abajo e' la Línea — TV Comunitaria de Temuco</title>
+<link rel="icon" type="image/png" href="logo.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.13/hls.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bitter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<header>
+  <div class="header-inner">
+    <div class="wordmark">
+      <img src="logo.png" alt="Abajo e' la Línea TV" class="logo-img">
+      <div class="wordmark-text">
+        <span>Abajo e' la Línea</span>
+        <span>TV Comunitaria · Temuco</span>
+      </div>
+    </div>
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#programas">Programas</a>
+      <a href="#sobre-canal">Sobre el Canal</a>
+      <a href="#noticias">Noticias</a>
+      <a href="#cultura">Cultura</a>
+      <a href="#deportes">Deportes</a>
+      <a href="#comunidad">Comunidad</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <a href="#inicio" class="live-pill"><span class="live-dot"></span> En vivo</a>
+  </div>
+</header>
+
+<section class="hero" id="inicio">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Señal abierta · comunitaria · Temuco</div>
+        <h1 class="hero-title">La tele que se hace <em>desde abajo</em></h1>
+        <p class="hero-copy">Contamos lo que pasa a orillas del Cautín: organizaciones, deporte, cultura y las noticias que los canales grandes no cubren. Sin filtro corporativo, con la comunidad al centro.</p>
+        <div class="hero-actions">
+          <a href="#sobre-canal" class="btn btn-ghost">Quiénes somos</a>
+          <a href="#sintonizar" class="btn btn-solid">Cómo sintonizarnos</a>
+        </div>
+      </div>
+
+      <div style="position:relative;">
+                <div class="player-card">
+          <div class="player-topbar">
+            <span class="channel-tag">CANAL EN LÍNEA</span>
+            <span class="live-pill" style="padding:6px 12px;"><span class="live-dot"></span> Directo</span>
+          </div>
+          <div class="video-frame">
+            <video id="livePlayer" controls playsinline></video>
+            <div class="video-msg" id="videoMsg">
+              Cargando transmisión en vivo…<br>si no carga, puede que la señal esté fuera de horario.
+            </div>
+          </div>
+          <div class="player-caption">
+            <span>Transmisión desde Temuco, Región de La Araucanía</span>
+            <span>abajoelalinea.cl</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="somos" id="sobre-canal">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">01 / Quiénes</div>
+      <h2 class="section-title">Quiénes somos</h2>
+    </div>
+    <div class="somos-grid">
+      <div>
+        <p>Abajo e' la Línea es un canal de televisión comunitaria transmitiendo en señal abierta desde Temuco.</p>
+        <p>Nacimos para dar voz a las organizaciones sociales, culturales y territoriales que rara vez aparecen en la pantalla de los canales tradicionales. Cubrimos deporte local, movilizaciones, cultura mapuche y la vida cotidiana del Wallmapu desde una mirada propia.</p>
+        <p>Somos parte de la red de televisión comunitaria digital de Chile: proyectos autogestionados, con concesión del CNTV, que defienden el derecho a que los barrios y territorios se cuenten a sí mismos.</p>
+        <div class="flag-strip" aria-hidden="true">
+          <span style="background:var(--red);"></span>
+          <span style="background:var(--ink);"></span>
+          <span style="background:var(--green);"></span>
+        </div>
+      </div>
+      <div class="fact-list">
+        <div class="fact">
+          <span class="fact-label">Sede</span>
+          <span class="fact-value">Temuco, Región de La Araucanía</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Formato</span>
+          <span class="fact-value">Televisión digital comunitaria, señal abierta · Canal 35.1</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Enfoque</span>
+          <span class="fact-value">Noticias locales, deporte, cultura y organizaciones sociales</span>
+        </div>
+        <div class="fact">
+          <span class="fact-label">Modelo</span>
+          <span class="fact-value">Medio autogestionado y comunitario</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sintonizar">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">02 / Sintonía</div>
+      <h2 class="section-title">Cómo sintonizarnos</h2>
+    </div>
+    <div class="sintonizar-grid">
+      <div class="sint-card">
+        <div class="n">01</div>
+        <h3>Por antena TVD</h3>
+        <p>Si tienes un televisor con sello TVD (Televisión Digital Terrestre) o un decodificador digital, sintoniza el <strong>canal 35.1</strong> en Temuco y alrededores.</p>
+      </div>
+      <div class="sint-card">
+        <div class="n">02</div>
+        <h3>Por internet, en vivo</h3>
+        <p>Mira la transmisión en directo desde este mismo sitio, arriba en la sección "En vivo", las 24 horas.</p>
+      </div>
+      <div class="sint-card">
+        <div class="n">03</div>
+        <h3>¿Tienes dudas?</h3>
+        <p>Escríbenos por nuestras redes sociales y te ayudamos a encontrar la señal en tu comuna.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="programas">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">03 / Al aire</div>
+      <h2 class="section-title">Programas</h2>
+    </div>
+    <div class="programas-grid">
+      <div class="prog-card">
+        <span class="prog-tag">Deportes</span>
+        <h3>Caseta Femenina</h3>
+        <p>Fútbol femenino analizado y conversado, desde lo local hasta la escena internacional.</p>
+      </div>
+      <div class="prog-card">
+        <span class="prog-tag">Noticias</span>
+        <h3>Notas y coyuntura</h3>
+        <p>Cobertura de audiencias, movilizaciones, seguridad y actualidad de la región.</p>
+      </div>
+      <div class="prog-card">
+        <span class="prog-tag">Cultura</span>
+        <h3>Territorio y comunidad</h3>
+        <p>Ferias, actividades culturales y organizaciones sociales del Wallmapu.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="noticias">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">04 / Al día</div>
+      <h2 class="section-title">Noticias</h2>
+    </div>
+    <p style="color:var(--cream-dim); max-width:60ch; margin-bottom:40px; font-size:1.02rem;">
+      Cobertura de la actualidad de Temuco y La Araucanía, más nuestras secciones de cultura, deporte y comunidad.
+    </p>
+
+    <div id="cultura" class="section-subhead"><span class="prog-tag" style="margin:0;">Cultura</span></div>
+    <div class="programas-grid" style="margin-bottom:48px;">
+      <div class="prog-card">
+        <h3>Ferias y encuentros culturales</h3>
+        <p>Actividades, talleres y espacios de la escena cultural de Temuco y el Wallmapu.</p>
+      </div>
+      <div class="prog-card">
+        <h3>Memoria y territorio</h3>
+        <p>Historias, tradiciones y voces del mundo mapuche contadas desde la comunidad.</p>
+      </div>
+    </div>
+
+    <div id="deportes" class="section-subhead"><span class="prog-tag" style="margin:0;">Deportes</span></div>
+    <div class="programas-grid" style="margin-bottom:48px;">
+      <div class="prog-card">
+        <h3>Deportes Temuco</h3>
+        <p>Resultados, análisis y la previa de cada fecha del cuadro local.</p>
+      </div>
+      <div class="prog-card">
+        <h3>Caseta Femenina</h3>
+        <p>Fútbol femenino analizado y conversado, desde lo local hasta la escena internacional.</p>
+      </div>
+    </div>
+
+    <div id="comunidad" class="section-subhead"><span class="prog-tag" style="margin:0;">Comunidad</span></div>
+    <div class="programas-grid">
+      <div class="prog-card">
+        <h3>Organizaciones sociales</h3>
+        <p>La agenda y las demandas de juntas de vecinos, agrupaciones y movimientos sociales.</p>
+      </div>
+      <div class="prog-card">
+        <h3>Seguridad y vida diaria</h3>
+        <p>Lo que pasa en los barrios: desde audiencias judiciales hasta la vida cotidiana del territorio.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="redes" id="contacto">
+  <div class="wrap redes-inner">
+    <div>
+      <h2>Contacto</h2>
+      <p>Escríbenos, síguenos o mándanos tus notas y contenidos desde el territorio.</p>
+      <p style="margin-top:14px; font-family:'Space Mono', monospace; font-size:0.85rem; color:var(--cream);">abajoelalinea.tv@gmail.com</p>
+    </div>
+    <div class="social-links">
+      <a class="social-link" href="https://www.instagram.com/abajoelalinea.tv/" target="_blank" rel="noopener">Instagram</a>
+      <a class="social-link" href="https://web.facebook.com/abajoelalinea.tv" target="_blank" rel="noopener">Facebook</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-wordmark" style="display:flex;align-items:center;gap:12px;"><img src="logo.png" alt="" style="width:40px;height:40px;border-radius:50%;">Abajo e' la Línea</div>
+      <div class="footer-meta">
+        Televisión comunitaria · Temuco, Chile<br>
+        abajoelalinea.tv@gmail.com
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Abajo e' la Línea TV</span>
+      <span>Medio comunitario autogestionado</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
