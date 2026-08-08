@@ -43,7 +43,6 @@ function programRowHtml(program) {
         ></iframe>
       </div>
       <div class="program-row-info">
-        ${program.category ? `<span class="prog-tag">${program.category}</span>` : ''}
         <h3>${program.title}</h3>
         ${program.description ? `<p>${program.description}</p>` : ''}
         ${date ? `<span class="mono">${date}</span>` : ''}
@@ -51,11 +50,37 @@ function programRowHtml(program) {
     </div>`;
 }
 
+// Agrupa por programa (categoría) y ordena cada sección por la publicación
+// más reciente de ese programa, para que el show más activo salga primero.
+function groupByProgram(programs) {
+  const groups = new Map();
+  for (const p of programs) {
+    const key = p.category || 'Otros';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(p);
+  }
+  return [...groups.entries()].sort(
+    ([, a], [, b]) => new Date(b[0].published_at) - new Date(a[0].published_at)
+  );
+}
+
+function sectionHtml(name, programs) {
+  return `
+    <div class="section-subhead" style="margin-top:56px;"><span class="prog-tag" style="margin:0;">${name}</span></div>
+    <div class="program-rows" style="margin-top:24px;">
+      ${programs.map(programRowHtml).join('')}
+    </div>`;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('programVideos');
   if (!container) return;
   const programs = await fetchPrograms();
-  container.innerHTML = programs.length
-    ? programs.map(programRowHtml).join('')
-    : '<p style="color:var(--cream-dim);">Todavía no hay programas subidos.</p>';
+  if (!programs.length) {
+    container.innerHTML = '<p style="color:var(--cream-dim);">Todavía no hay programas subidos.</p>';
+    return;
+  }
+  container.innerHTML = groupByProgram(programs)
+    .map(([name, items]) => sectionHtml(name, items))
+    .join('');
 });
