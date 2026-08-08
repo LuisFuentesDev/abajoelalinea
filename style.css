@@ -401,6 +401,39 @@
   .prog-card h3{font-size:1.3rem; color:var(--cream); margin-bottom:10px;}
   .prog-card p{color:var(--cream-dim); font-size:0.92rem;}
 
+  /* ---------- PROGRAMAS: videos (video a la izq, ficha a la der) ---------- */
+  .program-rows{display:flex; flex-direction:column; gap:24px;}
+  .program-row{
+    display:grid;
+    grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+    gap:0;
+    border:1px solid var(--line);
+    background:var(--ink-soft);
+    transition:border-color .2s ease;
+  }
+  .program-row:hover{border-color:var(--ochre);}
+  .program-row-video{
+    position:relative;
+    aspect-ratio:16/9;
+    background:var(--fixed-dark);
+  }
+  .program-row-video iframe{
+    position:absolute; inset:0;
+    width:100%; height:100%; border:none; display:block;
+  }
+  .program-row-info{
+    padding:28px 32px;
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .program-row-info h3{font-size:1.3rem; color:var(--cream); margin-bottom:10px;}
+  .program-row-info p{color:var(--cream-dim); font-size:0.94rem; line-height:1.6;}
+  .program-row-info .mono{margin-top:16px; font-size:0.72rem; color:var(--cream-dim); opacity:0.8;}
+
+  @media (max-width:800px){
+    .program-row{grid-template-columns:1fr;}
+    .program-row-info{padding:24px;}
+  }
+
   .note-inline{
     margin-top:28px;
     font-family:'Space Mono', monospace;
