@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abajo e' la Línea</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bitter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<header>
+  <div class="header-inner">
+    <div class="wordmark">
+      <img src="logo.png" alt="Abajo e' la Línea TV" class="logo-img">
+      <div class="wordmark-text">
+        <span>Abajo e' la Línea</span>
+        <span>TV Comunitaria · Temuco</span>
+      </div>
+    </div>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="programas.html">Programas</a>
+      <a href="index.html#sobre-canal">Sobre el Canal</a>
+      <a href="cultura.html">Cultura</a>
+      <a href="deportes.html">Deportes</a>
+      <a href="comunidad.html">Comunidad</a>
+      <a href="index.html#contacto">Contacto</a>
+    </nav>
+    <a href="index.html" class="live-pill"><span class="live-dot"></span> En vivo</a>
+  </div>
+</header>
+
+<section id="articulo">
+  <div class="wrap" style="max-width:760px;">
+    <div id="articuloContenido">
+      <p style="color:var(--cream-dim);">Cargando publicación…</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-wordmark" style="display:flex;align-items:center;gap:12px;"><img src="logo.png" alt="" style="width:40px;height:40px;border-radius:50%;">Abajo e' la Línea</div>
+      <div class="footer-meta">
+        Televisión comunitaria · Temuco, Chile<br>
+        abajoelalinea.tv@gmail.com
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Abajo e' la Línea TV</span>
+      <span>Medio comunitario autogestionado</span>
+    </div>
+  </div>
+</footer>
+
+<script src="supabase-articles.js"></script>
+<script>
+  (async () => {
+    const slug = new URLSearchParams(location.search).get('slug');
+    const el = document.getElementById('articuloContenido');
+    if (!slug) {
+      el.innerHTML = '<p style="color:var(--cream-dim);">Publicación no encontrada.</p>';
+      return;
+    }
+    const [article] = await fetchArticles({ slug, limit: 1 });
+    if (!article) {
+      el.innerHTML = '<p style="color:var(--cream-dim);">Publicación no encontrada.</p>';
+      return;
+    }
+    document.title = `${article.title} — Abajo e' la Línea`;
+    const date = article.published_at
+      ? new Date(article.published_at).toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+    el.innerHTML = `
+      <div class="section-head" style="margin-bottom:24px;">
+        <div class="section-num">${article.category || ''}</div>
+        <h1 class="section-title" style="font-size:clamp(1.8rem,4vw,2.6rem);">${article.title}</h1>
+      </div>
+      ${article.image_url ? `<img src="${article.image_url}" alt="" style="width:100%; border-radius:6px; margin-bottom:24px; aspect-ratio:16/9; object-fit:cover;">` : ''}
+      <p class="mono" style="color:var(--cream-dim); font-size:0.75rem; margin-bottom:24px;">${article.author || ''} ${date ? '· ' + date : ''}</p>
+      <div style="color:var(--cream-dim); font-size:1.05rem; line-height:1.7;">${article.content || ''}</div>
+      ${article.source_url ? `<p style="margin-top:32px;"><a href="${article.source_url}" target="_blank" rel="noopener" class="btn btn-ghost">Ver publicación original</a></p>` : ''}
+    `;
+  })();
+</script>
+
+</body>
+</html>
