@@ -420,3 +420,49 @@
   @media (prefers-reduced-motion: reduce){
     .live-dot{animation:none;}
   }
+
+  /* ---------- ADMIN ---------- */
+  .admin-field{margin-bottom:20px;}
+  .admin-field label{
+    display:flex; align-items:center; gap:12px; justify-content:space-between;
+    font-family:'Space Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--cream-dim);
+    margin-bottom:8px;
+  }
+  .admin-field input[type="text"],
+  .admin-field input[type="email"],
+  .admin-field input[type="password"],
+  .admin-field input[type="datetime-local"],
+  .admin-field input[type="file"],
+  .admin-field select,
+  .admin-field textarea{
+    width:100%;
+    background:var(--ink-soft);
+    border:1px solid var(--line);
+    color:var(--cream);
+    padding:12px 14px;
+    font-family:'Bitter', Georgia, serif;
+    font-size:0.95rem;
+  }
+  .admin-field textarea{resize:vertical;}
+  .admin-field input:focus, .admin-field select:focus, .admin-field textarea:focus{
+    outline:none; border-color:var(--red);
+  }
+  #loginForm{max-width:360px;}
+  .admin-row{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:16px 0;
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .admin-row .meta{color:var(--cream-dim); font-family:'Space Mono', monospace; font-size:0.72rem;}
+  .admin-row .actions{display:flex; gap:10px;}
+  .admin-row .actions button{
+    background:transparent; border:1px solid var(--cream-dim); color:var(--cream);
+    padding:6px 12px; font-family:'Space Mono', monospace; font-size:0.68rem;
+    text-transform:uppercase; cursor:pointer;
+  }
+  .admin-row .actions button:hover{border-color:var(--red); color:var(--red);}
