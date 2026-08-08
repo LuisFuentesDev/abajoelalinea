@@ -9,11 +9,13 @@ const SITE = 'abajolalinea';
 const STORAGE_BUCKET = 'article-images';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 const $ = (id) => document.getElementById(id);
-const loginForm = $('loginForm');
-const panel = $('panel');
-const logoutBtn = $('logoutBtn');
+
+let articles = [];
+let categoryFilter = 'Todas';
+let selectedId = null;
+
+// ---------- helpers ----------
 
 function slugify(text) {
   return text
@@ -29,10 +31,7 @@ function linesToHtml(text) {
 }
 
 function htmlToLines(html) {
-  return (html || '')
-    .replace(/<\/p>\s*<p>/gi, '\n')
-    .replace(/<\/?p>/gi, '')
-    .trim();
+  return (html || '').replace(/<\/p>\s*<p>/gi, '\n').replace(/<\/?p>/gi, '').trim();
 }
 
 function toLocalInputValue(iso) {
@@ -41,33 +40,125 @@ function toLocalInputValue(iso) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+function fmtDate(iso) {
+  return new Intl.DateTimeFormat('es-CL', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(iso));
+}
+
+// ---------- tabs ----------
+
+document.querySelectorAll('.admin-tab').forEach((btn) => {
+  btn.addEventListener('click', () => setTab(btn.dataset.tab));
+});
+
+function setTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('[data-panel]').forEach((p) => {
+    p.style.display = p.dataset.panel === tab ? (p.dataset.panel === 'editor' ? 'block' : 'block') : 'none';
+  });
+}
+
+// ---------- form ----------
+
 function resetForm() {
   $('articleForm').reset();
   $('articleId').value = '';
+  selectedId = null;
   $('author').value = "Abajo e' la Línea";
-  $('status').value = 'published';
+  $('status').value = 'draft';
   $('publishedAt').value = toLocalInputValue();
-  $('formModeLabel').textContent = 'Nueva';
+  $('editorTitle').textContent = 'Nueva noticia';
+  $('viewLink').style.display = 'none';
+  $('deleteBtn').style.display = 'none';
+  $('imagePreview').style.display = 'none';
   $('formError').style.display = 'none';
   $('formSuccess').style.display = 'none';
+  renderList();
 }
 
 function fillForm(article) {
+  selectedId = article.id;
   $('articleId').value = article.id;
   $('title').value = article.title || '';
   $('slug').value = article.slug || '';
   $('category').value = article.category || 'Comunidad';
+  $('status').value = article.status || 'draft';
   $('summary').value = article.summary || '';
   $('content').value = htmlToLines(article.content);
   $('imageUrl').value = article.image_url || '';
   $('sourceUrl').value = article.source_url || '';
   $('author').value = article.author || "Abajo e' la Línea";
-  $('status').value = article.status || 'published';
   $('publishedAt').value = toLocalInputValue(article.published_at);
-  $('formModeLabel').textContent = 'Editando';
+  $('editorTitle').textContent = 'Editar noticia';
+  $('deleteBtn').style.display = 'inline-flex';
+  if (article.image_url) {
+    $('imagePreview').src = article.image_url;
+    $('imagePreview').style.display = 'block';
+  } else {
+    $('imagePreview').style.display = 'none';
+  }
+  $('viewLink').style.display = 'inline-flex';
+  $('viewLink').href = `articulo.html?slug=${encodeURIComponent(article.slug)}`;
   $('formError').style.display = 'none';
   $('formSuccess').style.display = 'none';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTab('editor');
+  renderList();
+}
+
+// ---------- list ----------
+
+function renderPills() {
+  const cats = ['Todas', ...new Set(articles.map((a) => a.category))].sort((a, b) => a === 'Todas' ? -1 : a.localeCompare(b));
+  $('categoryFilters').innerHTML = cats.map((c) =>
+    `<button type="button" class="admin-pill ${c === categoryFilter ? 'active' : ''}" data-cat="${c}">${c}</button>`
+  ).join('');
+  $('categoryFilters').querySelectorAll('[data-cat]').forEach((btn) => {
+    btn.addEventListener('click', () => { categoryFilter = btn.dataset.cat; renderList(); });
+  });
+}
+
+function renderList() {
+  renderPills();
+  const filtered = articles.filter((a) => categoryFilter === 'Todas' || a.category === categoryFilter);
+  const list = $('articleList');
+
+  if (!filtered.length) {
+    list.innerHTML = `<p style="color:var(--cream-dim); border:1px dashed var(--line); border-radius:12px; padding:24px; text-align:center;">
+      ${categoryFilter === 'Todas' ? "Aún no hay noticias cargadas." : `No hay noticias en ${categoryFilter}.`}
+    </p>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map((a) => `
+    <div class="admin-item ${a.id === selectedId ? 'selected' : ''}" data-open="${a.id}">
+      <span class="cat">${a.category} · ${a.status}</span>
+      <h3>${a.title}</h3>
+      <div class="date">${fmtDate(a.published_at)}</div>
+      <div class="row-actions">
+        <button type="button" data-edit="${a.id}">Editar</button>
+        <button type="button" data-delete="${a.id}">Eliminar</button>
+      </div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('[data-edit]').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); openArticle(btn.dataset.edit); });
+  });
+  list.querySelectorAll('[data-open]').forEach((el) => {
+    el.addEventListener('click', () => openArticle(el.dataset.open));
+  });
+  list.querySelectorAll('[data-delete]').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm('¿Eliminar permanentemente esta noticia? Esta acción no se puede deshacer.')) return;
+      await supabase.from('articles').delete().eq('id', btn.dataset.delete);
+      await loadArticles();
+    });
+  });
+}
+
+async function openArticle(id) {
+  const { data, error } = await supabase.from('articles').select('*').eq('id', id).single();
+  if (!error) fillForm(data);
 }
 
 async function loadArticles() {
@@ -76,44 +167,19 @@ async function loadArticles() {
     .select('id, slug, title, category, status, published_at')
     .eq('site', SITE)
     .order('published_at', { ascending: false });
-
-  const list = $('articleList');
-  if (error) {
-    list.innerHTML = `<p style="color:var(--red);">Error cargando publicaciones: ${error.message}</p>`;
-    return;
-  }
-  if (!data.length) {
-    list.innerHTML = '<p style="color:var(--cream-dim);">Todavía no hay publicaciones.</p>';
-    return;
-  }
-  list.innerHTML = data.map((a) => `
-    <div class="admin-row">
-      <div>
-        <strong>${a.title}</strong>
-        <div class="meta">${a.category} · ${a.status} · ${new Date(a.published_at).toLocaleDateString('es-CL')}</div>
-      </div>
-      <div class="actions">
-        <button data-edit="${a.id}">Editar</button>
-        <button data-delete="${a.id}">Eliminar</button>
-      </div>
-    </div>
-  `).join('');
-
-  list.querySelectorAll('[data-edit]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const { data: full, error: e } = await supabase
-        .from('articles').select('*').eq('id', btn.dataset.edit).single();
-      if (!e) fillForm(full);
-    });
-  });
-  list.querySelectorAll('[data-delete]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      if (!confirm('¿Eliminar esta publicación?')) return;
-      await supabase.from('articles').delete().eq('id', btn.dataset.delete);
-      loadArticles();
-    });
-  });
+  if (!error) articles = data;
+  renderList();
 }
+
+// ---------- image upload ----------
+
+$('imageFile').addEventListener('change', () => {
+  const file = $('imageFile').files[0];
+  if (!file) return;
+  $('imagePreview').src = URL.createObjectURL(file);
+  $('imagePreview').style.display = 'block';
+  $('imageFileLabel').textContent = file.name;
+});
 
 async function uploadImageIfNeeded() {
   const file = $('imageFile').files[0];
@@ -129,19 +195,13 @@ async function uploadImageIfNeeded() {
   return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
-$('genSlug').addEventListener('click', () => {
-  $('slug').value = slugify($('title').value);
-});
+// ---------- save / new / delete ----------
 
-$('newBtn').addEventListener('click', resetForm);
-
-$('articleForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
+async function saveArticle(statusOverride) {
   const formError = $('formError');
   const formSuccess = $('formSuccess');
   formError.style.display = 'none';
   formSuccess.style.display = 'none';
-  $('saveBtn').disabled = true;
 
   try {
     const imageUrl = await uploadImageIfNeeded();
@@ -155,53 +215,70 @@ $('articleForm').addEventListener('submit', async (e) => {
       image_url: imageUrl,
       source_url: $('sourceUrl').value.trim() || null,
       site: SITE,
-      status: $('status').value,
+      status: statusOverride || $('status').value,
       published_at: new Date($('publishedAt').value).toISOString(),
     };
 
     const id = $('articleId').value;
-    const { error } = id
-      ? await supabase.from('articles').update(payload).eq('id', id)
-      : await supabase.from('articles').insert(payload);
-
+    const query = id
+      ? supabase.from('articles').update(payload).eq('id', id).select().single()
+      : supabase.from('articles').insert(payload).select().single();
+    const { data, error } = await query;
     if (error) throw error;
 
-    formSuccess.textContent = 'Guardado correctamente.';
+    formSuccess.textContent = payload.status === 'published' ? 'Noticia publicada.' : 'Cambios guardados.';
     formSuccess.style.display = 'block';
-    resetForm();
-    loadArticles();
+    await loadArticles();
+    fillForm(data);
   } catch (err) {
     formError.textContent = err.message || String(err);
     formError.style.display = 'block';
-  } finally {
-    $('saveBtn').disabled = false;
   }
+}
+
+$('articleForm').addEventListener('submit', (e) => { e.preventDefault(); saveArticle(); });
+$('saveDraftBtn').addEventListener('click', () => saveArticle('draft'));
+$('publishBtn').addEventListener('click', () => saveArticle('published'));
+$('genSlug').addEventListener('click', () => { $('slug').value = slugify($('title').value); });
+$('newBtn').addEventListener('click', resetForm);
+$('refreshBtn').addEventListener('click', loadArticles);
+
+$('deleteBtn').addEventListener('click', async () => {
+  const id = $('articleId').value;
+  if (!id) return;
+  if (!confirm(`¿Eliminar permanentemente "${$('title').value}"? Esta acción no se puede deshacer.`)) return;
+  await supabase.from('articles').delete().eq('id', id);
+  await loadArticles();
+  resetForm();
 });
+
+// ---------- auth ----------
 
 $('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const loginError = $('loginError');
   loginError.style.display = 'none';
+  $('loginBtn').disabled = true;
   const { error } = await supabase.auth.signInWithPassword({
     email: $('email').value.trim(),
     password: $('password').value,
   });
+  $('loginBtn').disabled = false;
   if (error) {
     loginError.textContent = 'Correo o contraseña incorrectos.';
     loginError.style.display = 'block';
   }
 });
 
-logoutBtn.addEventListener('click', async () => {
-  await supabase.auth.signOut();
-});
+$('logoutBtn').addEventListener('click', () => supabase.auth.signOut());
 
 supabase.auth.onAuthStateChange((_event, session) => {
   const loggedIn = Boolean(session);
-  loginForm.style.display = loggedIn ? 'none' : 'block';
-  panel.style.display = loggedIn ? 'block' : 'none';
-  logoutBtn.style.display = loggedIn ? 'inline-flex' : 'none';
+  $('loginScreen').style.display = loggedIn ? 'none' : 'flex';
+  $('dashboard').style.display = loggedIn ? 'block' : 'none';
   if (loggedIn) {
+    $('sessionEmail').textContent = session.user.email;
+    setTab('list');
     resetForm();
     loadArticles();
   }
