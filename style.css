@@ -101,6 +101,7 @@
     border-bottom:1px solid var(--line);
   }
   .header-inner{
+    position:relative;
     display:flex; align-items:center; justify-content:space-between;
     padding:16px 28px;
     max-width:1180px; margin:0 auto;
@@ -160,7 +161,19 @@
     50%{opacity:0.35; transform:scale(0.8);}
   }
 
-  .nav-toggle{display:none;}
+  .nav-toggle{
+    display:none;
+    align-items:center; justify-content:center;
+    width:38px; height:38px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--cream);
+    font-size:1.1rem;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .nav-toggle:hover{border-color:var(--ochre);}
 
   /* ---------- HERO ---------- */
   .hero{
@@ -499,7 +512,22 @@
 
   /* ---------- RESPONSIVE ---------- */
   @media (max-width: 900px){
-    nav{display:none;}
+    header .live-pill{display:none;}
+    .nav-toggle{display:flex;}
+    nav{
+      display:none;
+      position:absolute;
+      top:100%; left:0; right:0;
+      flex-direction:column;
+      align-items:stretch;
+      gap:0;
+      background:var(--ink);
+      border-bottom:1px solid var(--line);
+      padding:4px 28px 16px;
+    }
+    nav.nav-open{display:flex;}
+    nav a{padding:14px 0; border-bottom:1px solid var(--line);}
+    nav a:last-child{border-bottom:none;}
     .hero-grid{grid-template-columns:1fr;}
     .somos-grid{grid-template-columns:1fr; gap:36px;}
     .sintonizar-grid{grid-template-columns:1fr;}
