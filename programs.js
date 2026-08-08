@@ -64,23 +64,42 @@ function groupByProgram(programs) {
   );
 }
 
-function sectionHtml(name, programs) {
+function sectionHtml(name, programs, { withHeader = true } = {}) {
   return `
-    <div class="section-subhead" style="margin-top:56px;"><span class="prog-tag" style="margin:0;">${name}</span></div>
-    <div class="program-rows" style="margin-top:24px;">
+    ${withHeader ? `<div class="section-subhead" style="margin-top:56px;"><span class="prog-tag" style="margin:0;">${name}</span></div>` : ''}
+    <div class="program-rows" style="margin-top:${withHeader ? '24' : '0'}px;">
       ${programs.map(programRowHtml).join('')}
     </div>`;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('programVideos');
+  const filters = document.getElementById('programFilters');
   if (!container) return;
+
   const programs = await fetchPrograms();
   if (!programs.length) {
     container.innerHTML = '<p style="color:var(--cream-dim);">Todavía no hay programas subidos.</p>';
     return;
   }
-  container.innerHTML = groupByProgram(programs)
-    .map(([name, items]) => sectionHtml(name, items))
-    .join('');
+
+  const groups = groupByProgram(programs);
+  let active = 'Todos';
+
+  function render() {
+    if (filters) {
+      filters.innerHTML = ['Todos', ...groups.map(([name]) => name)]
+        .map((name) => `<button type="button" class="admin-pill ${name === active ? 'active' : ''}" data-cat="${name}">${name}</button>`)
+        .join('');
+      filters.querySelectorAll('[data-cat]').forEach((btn) => {
+        btn.addEventListener('click', () => { active = btn.dataset.cat; render(); });
+      });
+    }
+
+    container.innerHTML = active === 'Todos'
+      ? groups.map(([name, items]) => sectionHtml(name, items)).join('')
+      : sectionHtml(active, groups.find(([name]) => name === active)[1], { withHeader: false });
+  }
+
+  render();
 });
