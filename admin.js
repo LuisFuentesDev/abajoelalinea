@@ -272,6 +272,137 @@ $('loginForm').addEventListener('submit', async (e) => {
 
 $('logoutBtn').addEventListener('click', () => supabase.auth.signOut());
 
+// ---------- programas (videos de YouTube) ----------
+
+let programs = [];
+let selectedProgramId = null;
+
+function resetProgramForm() {
+  $('programForm').reset();
+  $('programId').value = '';
+  selectedProgramId = null;
+  $('programStatus').value = 'draft';
+  $('programPublishedAt').value = toLocalInputValue();
+  $('programFormTitle').textContent = 'Nuevo programa';
+  $('programDeleteBtn').style.display = 'none';
+  $('programFormError').style.display = 'none';
+  $('programFormSuccess').style.display = 'none';
+  renderProgramList();
+}
+
+function fillProgramForm(program) {
+  selectedProgramId = program.id;
+  $('programId').value = program.id;
+  $('programTitle').value = program.title || '';
+  $('programYoutubeUrl').value = program.youtube_url || '';
+  $('programCategory').value = program.category || '';
+  $('programStatus').value = program.status || 'draft';
+  $('programPublishedAt').value = toLocalInputValue(program.published_at);
+  $('programDescription').value = program.description || '';
+  $('programFormTitle').textContent = 'Editar programa';
+  $('programDeleteBtn').style.display = 'inline-flex';
+  $('programFormError').style.display = 'none';
+  $('programFormSuccess').style.display = 'none';
+  renderProgramList();
+}
+
+function renderProgramList() {
+  const list = $('programList');
+  if (!programs.length) {
+    list.innerHTML = '<p style="color:var(--cream-dim); border:1px dashed var(--line); border-radius:12px; padding:24px; text-align:center;">Aún no hay programas cargados.</p>';
+    return;
+  }
+  list.innerHTML = programs.map((p) => `
+    <div class="admin-item ${p.id === selectedProgramId ? 'selected' : ''}" data-open="${p.id}">
+      <span class="cat">${p.category || 'Sin categoría'} · ${p.status}</span>
+      <h3>${p.title}</h3>
+      <div class="date">${fmtDate(p.published_at)}</div>
+      <div class="row-actions">
+        <button type="button" data-edit="${p.id}">Editar</button>
+        <button type="button" data-delete="${p.id}">Eliminar</button>
+      </div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('[data-edit]').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); openProgram(btn.dataset.edit); });
+  });
+  list.querySelectorAll('[data-open]').forEach((el) => {
+    el.addEventListener('click', () => openProgram(el.dataset.open));
+  });
+  list.querySelectorAll('[data-delete]').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm('¿Eliminar permanentemente este programa? Esta acción no se puede deshacer.')) return;
+      await supabase.from('programs').delete().eq('id', btn.dataset.delete);
+      await loadPrograms();
+    });
+  });
+}
+
+async function openProgram(id) {
+  const { data, error } = await supabase.from('programs').select('*').eq('id', id).single();
+  if (!error) fillProgramForm(data);
+}
+
+async function loadPrograms() {
+  const { data, error } = await supabase
+    .from('programs')
+    .select('id, title, category, status, published_at')
+    .eq('site', SITE)
+    .order('published_at', { ascending: false });
+  if (!error) programs = data;
+  renderProgramList();
+}
+
+$('programForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formError = $('programFormError');
+  const formSuccess = $('programFormSuccess');
+  formError.style.display = 'none';
+  formSuccess.style.display = 'none';
+
+  try {
+    const payload = {
+      title: $('programTitle').value.trim(),
+      youtube_url: $('programYoutubeUrl').value.trim(),
+      category: $('programCategory').value.trim() || null,
+      description: $('programDescription').value.trim() || null,
+      site: SITE,
+      status: $('programStatus').value,
+      published_at: new Date($('programPublishedAt').value).toISOString(),
+    };
+
+    const id = $('programId').value;
+    const query = id
+      ? supabase.from('programs').update(payload).eq('id', id).select().single()
+      : supabase.from('programs').insert(payload).select().single();
+    const { data, error } = await query;
+    if (error) throw error;
+
+    formSuccess.textContent = 'Guardado correctamente.';
+    formSuccess.style.display = 'block';
+    await loadPrograms();
+    fillProgramForm(data);
+  } catch (err) {
+    formError.textContent = err.message || String(err);
+    formError.style.display = 'block';
+  }
+});
+
+$('programNewBtn').addEventListener('click', resetProgramForm);
+
+$('programDeleteBtn').addEventListener('click', async () => {
+  const id = $('programId').value;
+  if (!id) return;
+  if (!confirm(`¿Eliminar permanentemente "${$('programTitle').value}"? Esta acción no se puede deshacer.`)) return;
+  await supabase.from('programs').delete().eq('id', id);
+  await loadPrograms();
+  resetProgramForm();
+});
+
+// ---------- auth ----------
+
 supabase.auth.onAuthStateChange((_event, session) => {
   const loggedIn = Boolean(session);
   $('loginScreen').style.display = loggedIn ? 'none' : 'flex';
@@ -281,5 +412,7 @@ supabase.auth.onAuthStateChange((_event, session) => {
     setTab('list');
     resetForm();
     loadArticles();
+    resetProgramForm();
+    loadPrograms();
   }
 });

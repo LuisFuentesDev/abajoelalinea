@@ -57,6 +57,7 @@
       <div class="admin-tabbar">
         <button type="button" class="admin-tab active" data-tab="list">Noticias</button>
         <button type="button" class="admin-tab" data-tab="editor">Editor</button>
+        <button type="button" class="admin-tab" data-tab="programs">Programas</button>
       </div>
 
       <!-- Tab: lista -->
@@ -156,6 +157,64 @@
             <button type="button" class="btn btn-solid" id="publishBtn">Publicar ahora</button>
           </div>
         </form>
+      </div>
+
+      <!-- Tab: programas -->
+      <div data-panel="programs" class="admin-card" style="display:none;">
+        <div style="margin-bottom:20px;">
+          <h2 style="font-family:'Anton',sans-serif; text-transform:uppercase; font-size:1.3rem;" id="programFormTitle">Nuevo programa</h2>
+          <p style="color:var(--cream-dim); font-size:0.85rem;">Pega el link de YouTube del episodio grabado — no se sube ningún archivo, solo se embebe el video.</p>
+        </div>
+
+        <form id="programForm">
+          <input type="hidden" id="programId">
+
+          <div class="admin-field">
+            <label for="programTitle">Título</label>
+            <input type="text" id="programTitle" placeholder="Caseta Femenina — Capítulo 12" required>
+          </div>
+
+          <div class="admin-grid-2">
+            <div class="admin-field">
+              <label for="programYoutubeUrl">Link de YouTube</label>
+              <input type="text" id="programYoutubeUrl" placeholder="https://www.youtube.com/watch?v=..." required>
+            </div>
+            <div class="admin-field">
+              <label for="programCategory">Programa / categoría</label>
+              <input type="text" id="programCategory" placeholder="Caseta Femenina">
+            </div>
+            <div class="admin-field">
+              <label for="programStatus">Estado</label>
+              <select id="programStatus">
+                <option value="draft">Borrador</option>
+                <option value="published">Publicado</option>
+                <option value="archived">Archivado</option>
+              </select>
+            </div>
+            <div class="admin-field">
+              <label for="programPublishedAt">Fecha de publicación</label>
+              <input type="datetime-local" id="programPublishedAt" required>
+            </div>
+          </div>
+
+          <div class="admin-field">
+            <label for="programDescription">Descripción (opcional)</label>
+            <textarea id="programDescription" rows="3"></textarea>
+          </div>
+
+          <p id="programFormError" style="color:var(--red); font-size:0.85rem; display:none;"></p>
+          <p id="programFormSuccess" style="color:var(--green); font-size:0.85rem; display:none;"></p>
+
+          <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:8px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-ghost" id="programDeleteBtn" style="display:none; border-color:var(--red); color:var(--red);">Eliminar</button>
+            <button type="button" class="btn btn-ghost" id="programNewBtn">Nuevo programa</button>
+            <button type="submit" class="btn btn-solid" id="programSaveBtn">Guardar</button>
+          </div>
+        </form>
+
+        <div style="margin-top:32px; border-top:1px solid var(--line); padding-top:20px;">
+          <div id="programList"></div>
+        </div>
       </div>
 
     </div>
