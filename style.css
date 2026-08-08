@@ -9,7 +9,54 @@
     --green:#58a60c;
     --green-deep:#2e5610;
     --line: rgba(239,231,216,0.16);
+    --header-bg: rgba(0,0,0,0.92);
+
+    /* Fijos: el video en vivo y el bloque "manifiesto" no cambian con el tema,
+       para que siempre se lean bien encima del negro del video o del cream fijo. */
+    --fixed-dark:#000000;
+    --fixed-light-text:#efe7d8;
+    --fixed-light-text-dim:#e2d8c3;
+    --fixed-card-bg:#efe7d8;
+    --fixed-card-text:#171410;
+    --fixed-card-text-dim:#3a352b;
   }
+
+  /* Sigue la preferencia del sistema mientras el usuario no haya elegido manualmente
+     (el botón de la nav marca data-theme y ese valor manda por sobre esto). */
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme]){
+      --ink:#f4efe4;
+      --ink-soft:#ffffff;
+      --cream:#171410;
+      --cream-dim:#4a443a;
+      --line: rgba(23,20,15,0.12);
+      --header-bg: rgba(244,239,228,0.92);
+    }
+  }
+
+  :root[data-theme="light"]{
+    --ink:#f4efe4;
+    --ink-soft:#ffffff;
+    --cream:#171410;
+    --cream-dim:#4a443a;
+    --line: rgba(23,20,15,0.12);
+    --header-bg: rgba(244,239,228,0.92);
+  }
+
+  body{transition:background-color .2s ease, color .2s ease;}
+
+  .theme-toggle{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:38px; height:38px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--cream);
+    font-size:1rem;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .theme-toggle:hover{border-color:var(--ochre);}
 
   *{box-sizing:border-box; margin:0; padding:0;}
 
@@ -49,7 +96,7 @@
   /* ---------- HEADER ---------- */
   header{
     position:sticky; top:0; z-index:50;
-    background:rgba(0,0,0,0.92);
+    background:var(--header-bg);
     backdrop-filter:blur(6px);
     border-bottom:1px solid var(--line);
   }
@@ -125,7 +172,7 @@
   .hero::before{
     content:'';
     position:absolute; inset:0;
-    background:#000;
+    background:var(--fixed-dark);
     pointer-events:none;
   }
   .hero-grid{
@@ -147,17 +194,17 @@
   .eyebrow::before{content:'—'; color:var(--red);}
   h1.hero-title{
     font-size:clamp(2.6rem, 5.4vw, 4.4rem);
-    color:var(--cream);
+    color:var(--fixed-light-text);
   }
   h1.hero-title em{
     font-style:normal;
     color:var(--red);
-    -webkit-text-stroke:1px var(--cream);
+    -webkit-text-stroke:1px var(--fixed-light-text);
   }
   .hero-copy{
     margin-top:22px;
     max-width:46ch;
-    color:var(--cream-dim);
+    color:var(--fixed-light-text-dim);
     font-size:1.05rem;
   }
   .hero-actions{
@@ -178,10 +225,17 @@
   .btn-solid:hover{background:var(--red-dark); border-color:var(--red-dark);}
   .btn-ghost:hover{background:var(--red); color:var(--cream); border-color:var(--red);}
 
+  /* Botones dentro del hero: se apoyan en el fondo siempre-oscuro, no en el tema. */
+  .hero .btn{border-color:var(--fixed-light-text); color:var(--fixed-light-text);}
+  .hero .btn-solid{color:var(--fixed-light-text);}
+  .hero .btn-ghost:hover{color:var(--fixed-light-text);}
+
+  /* El "marco de TV" (player-card, video, mensajes) queda siempre oscuro,
+     no sigue el tema — igual que la pantalla de un televisor apagado. */
   .player-card{
     position:relative;
-    background:var(--ink-soft);
-    border:1px solid var(--line);
+    background:var(--fixed-dark);
+    border:1px solid rgba(239,231,216,0.16);
     padding:14px;
   }
   .player-card::before{
@@ -199,34 +253,34 @@
     font-family:'Space Mono', monospace;
     font-size:0.72rem;
     letter-spacing:0.08em;
-    color:var(--cream-dim);
+    color:var(--fixed-light-text-dim);
   }
   .video-frame{
     position:relative;
     width:100%;
     aspect-ratio:16/9;
-    background:#000;
+    background:var(--fixed-dark);
     overflow:hidden;
   }
   video{width:100%; height:100%; object-fit:cover; display:block;}
-  video:fullscreen{object-fit:contain; background:#000;}
-  video:-webkit-full-screen{object-fit:contain; background:#000;}
+  video:fullscreen{object-fit:contain; background:var(--fixed-dark);}
+  video:-webkit-full-screen{object-fit:contain; background:var(--fixed-dark);}
   .video-msg{
     position:absolute; inset:0;
     display:flex; align-items:center; justify-content:center;
     flex-direction:column; gap:10px;
     padding:20px; text-align:center;
-    color:var(--cream-dim);
+    color:var(--fixed-light-text-dim);
     font-family:'Space Mono', monospace;
     font-size:0.8rem;
-    background:#000;
+    background:var(--fixed-dark);
   }
   .video-msg.hidden{display:none;}
   .player-caption{
     margin-top:12px;
     font-family:'Space Mono', monospace;
     font-size:0.7rem;
-    color:var(--cream-dim);
+    color:var(--fixed-light-text-dim);
     display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
     padding:0 4px;
   }
@@ -251,23 +305,25 @@
   .section-title{font-size:clamp(2rem, 3.6vw, 3rem); color:var(--cream);}
 
   /* ---------- QUIENES SOMOS ---------- */
+  /* Tarjeta fija clara ("recuadro impreso"), no sigue el tema en ningún sentido. */
   .somos{
-    background:var(--cream);
-    color:var(--ink);
+    background:var(--fixed-card-bg);
+    color:var(--fixed-card-text);
     border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);
   }
   .somos .section-num{color:var(--red); border-top-color:var(--red);}
+  .somos .section-title{color:var(--fixed-card-text);}
   .somos-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:64px;
     align-items:start;
   }
-  .somos p{margin-bottom:18px; color:#3a352b; max-width:52ch;}
+  .somos p{margin-bottom:18px; color:var(--fixed-card-text-dim); max-width:52ch;}
   .somos p:first-of-type{
     font-size:1.2rem;
-    color:var(--ink);
+    color:var(--fixed-card-text);
     font-weight:600;
   }
   .flag-strip{
@@ -291,7 +347,7 @@
     text-transform:uppercase;
     color:var(--red);
   }
-  .fact-value{font-size:1.02rem; color:var(--ink);}
+  .fact-value{font-size:1.02rem; color:var(--fixed-card-text);}
 
   /* ---------- SINTONIZAR ---------- */
   .sintonizar-grid{
@@ -370,7 +426,8 @@
     display:flex; align-items:center; justify-content:space-between;
     flex-wrap:wrap; gap:32px;
   }
-  .redes h2{color:var(--cream); font-size:clamp(1.8rem,3.4vw,2.6rem); max-width:16ch;}
+  /* Texto fijo claro: el fondo siempre es verde, sin importar el tema. */
+  .redes h2{color:var(--fixed-light-text); font-size:clamp(1.8rem,3.4vw,2.6rem); max-width:16ch;}
   .redes p{color:rgba(239,231,216,0.75); margin-top:14px; max-width:42ch;}
   .social-links{display:flex; gap:14px; flex-wrap:wrap;}
   .social-link{
@@ -380,9 +437,9 @@
     font-size:0.78rem;
     letter-spacing:0.06em;
     text-transform:uppercase;
-    color:var(--cream);
+    color:var(--fixed-light-text);
   }
-  .social-link:hover{background:var(--cream); color:var(--green);}
+  .social-link:hover{background:var(--fixed-light-text); color:var(--green);}
 
   /* ---------- FOOTER ---------- */
   footer{padding:56px 0 36px;}

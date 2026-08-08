@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Comunidad — Abajo e' la Línea</title>
 <link rel="icon" type="image/png" href="logo.png">
@@ -32,6 +33,7 @@
       <a href="index.html#contacto">Contacto</a>
     </nav>
     <a href="index.html" class="live-pill"><span class="live-dot"></span> En vivo</a>
+    <button class="theme-toggle" aria-label="Cambiar tema"></button>
   </div>
 </header>
 
@@ -61,5 +63,6 @@
   </div>
 </footer>
 
+<script src="theme.js" defer></script>
 </body>
 </html>

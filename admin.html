@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Dashboard — Abajo e' la Línea</title>
@@ -15,6 +16,10 @@
 
 <section id="admin">
   <div class="wrap" style="max-width:1080px; padding-top:40px; padding-bottom:80px;">
+
+    <div style="display:flex; justify-content:flex-end;">
+      <button class="theme-toggle" aria-label="Cambiar tema"></button>
+    </div>
 
     <!-- Login -->
     <div id="loginScreen" style="min-height:70vh; display:flex; align-items:center;">
@@ -161,6 +166,7 @@
 </section>
 
 <script type="module" src="admin.js"></script>
+<script src="theme.js" defer></script>
 
 </body>
 </html>
