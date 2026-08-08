@@ -403,16 +403,30 @@ $('programDeleteBtn').addEventListener('click', async () => {
 
 // ---------- auth ----------
 
-supabase.auth.onAuthStateChange((_event, session) => {
+// onAuthStateChange dispara no solo al iniciar sesión: también en
+// TOKEN_REFRESHED (p.ej. al volver a la pestaña), USER_UPDATED, etc.
+// Solo reseteamos el dashboard la primera vez que hay sesión, no en cada
+// evento — si no, cambiar de pestaña del navegador te sacaba de donde estabas.
+let dashboardInitialized = false;
+
+supabase.auth.onAuthStateChange((event, session) => {
   const loggedIn = Boolean(session);
   $('loginScreen').style.display = loggedIn ? 'none' : 'flex';
   $('dashboard').style.display = loggedIn ? 'block' : 'none';
-  if (loggedIn) {
-    $('sessionEmail').textContent = session.user.email;
-    setTab('list');
-    resetForm();
-    loadArticles();
-    resetProgramForm();
-    loadPrograms();
+
+  if (!loggedIn) {
+    dashboardInitialized = false;
+    return;
   }
+
+  $('sessionEmail').textContent = session.user.email;
+
+  if (dashboardInitialized) return;
+  dashboardInitialized = true;
+
+  setTab('list');
+  resetForm();
+  loadArticles();
+  resetProgramForm();
+  loadPrograms();
 });
