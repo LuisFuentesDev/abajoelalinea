@@ -15,11 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bitter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <section id="admin">
-  <div class="wrap" style="max-width:1080px; padding-top:40px; padding-bottom:80px;">
-
-    <div style="display:flex; justify-content:flex-end;">
-      <button class="theme-toggle" aria-label="Cambiar tema"></button>
-    </div>
+  <div class="wrap" style="max-width:1080px; padding-top:20px; padding-bottom:80px;">
 
     <!-- Login -->
     <div id="loginScreen" style="min-height:70vh; display:flex; align-items:center;">
@@ -50,7 +46,8 @@
           <h1 class="section-title" style="font-size:1.9rem;">Gestión manual de noticias</h1>
           <p style="color:var(--cream-dim); font-size:0.85rem; margin-top:4px;">Sesión activa como <span id="sessionEmail"></span></p>
         </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <button class="theme-toggle" aria-label="Cambiar tema"></button>
           <button type="button" class="btn btn-ghost" id="refreshBtn">Actualizar</button>
           <button type="button" class="btn btn-ghost" id="newBtn">+ Nueva noticia</button>
           <button type="button" class="btn btn-ghost" id="logoutBtn">Salir</button>
