@@ -1,6 +1,6 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/programas/:category", "destination": "/programas.html" }
+    { "source": "/programas/:category", "destination": "/programas" }
   ]
 }
