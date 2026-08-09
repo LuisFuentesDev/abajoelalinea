@@ -72,6 +72,22 @@ function sectionHtml(name, programs, { withHeader = true } = {}) {
     </div>`;
 }
 
+// /programas/casetafemenina — sin tildes/espacios/guiones, para que la URL
+// se vea limpia (ej. "Caseta Femenina" -> "casetafemenina").
+function slugifyCategory(name) {
+  return String(name || '')
+    .normalize('NFKD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function categoryFromPath(groups) {
+  const match = location.pathname.match(/^\/programas\/([^/]+)\/?$/);
+  if (!match) return 'Todos';
+  const slug = decodeURIComponent(match[1]);
+  const found = groups.find(([name]) => slugifyCategory(name) === slug);
+  return found ? found[0] : 'Todos';
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('programVideos');
   const filters = document.getElementById('programFilters');
@@ -84,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const groups = groupByProgram(programs);
-  let active = 'Todos';
+  let active = categoryFromPath(groups);
 
   function render() {
     if (filters) {
@@ -92,7 +108,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         .map((name) => `<button type="button" class="admin-pill ${name === active ? 'active' : ''}" data-cat="${name}">${name}</button>`)
         .join('');
       filters.querySelectorAll('[data-cat]').forEach((btn) => {
-        btn.addEventListener('click', () => { active = btn.dataset.cat; render(); });
+        btn.addEventListener('click', () => {
+          active = btn.dataset.cat;
+          const path = active === 'Todos' ? '/programas' : `/programas/${slugifyCategory(active)}`;
+          history.pushState(null, '', path);
+          render();
+        });
       });
     }
 
@@ -100,6 +121,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       ? groups.map(([name, items]) => sectionHtml(name, items)).join('')
       : sectionHtml(active, groups.find(([name]) => name === active)[1], { withHeader: false });
   }
+
+  window.addEventListener('popstate', () => {
+    active = categoryFromPath(groups);
+    render();
+  });
 
   render();
 });
