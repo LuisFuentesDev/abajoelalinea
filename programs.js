@@ -3,6 +3,8 @@
 const SUPABASE_URL = 'https://rogafinwshzgornhrxap.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_NfKcVml8rLAlf050xgJq3g_rq557P6h';
 const SITE = 'abajolalinea';
+const CACHE_KEY = `programs:${SITE}`;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 min, mismo criterio que supabase-articles.js
 
 function youtubeId(url) {
   const m = String(url || '').match(
@@ -11,7 +13,26 @@ function youtubeId(url) {
   return m ? m[1] : null;
 }
 
-async function fetchPrograms() {
+function readCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const { data, savedAt } = JSON.parse(raw);
+    return { data, isFresh: Date.now() - savedAt < CACHE_TTL_MS };
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data, savedAt: Date.now() }));
+  } catch {
+    // localStorage lleno o bloqueado (modo privado) — no es crítico.
+  }
+}
+
+async function fetchProgramsFresh() {
   const params = new URLSearchParams({
     select: 'id,title,description,youtube_url,category,published_at',
     site: `eq.${SITE}`,
@@ -23,6 +44,19 @@ async function fetchPrograms() {
   });
   if (!res.ok) return [];
   return res.json();
+}
+
+// Stale-while-revalidate: devuelve lo cacheado al instante (si hay) y llama a
+// onFresh cuando llega la respuesta real, para actualizar sin bloquear el
+// primer render.
+async function fetchPrograms(onFresh) {
+  const cached = readCache();
+  const freshPromise = fetchProgramsFresh().then((data) => {
+    writeCache(data);
+    onFresh?.(data);
+    return data;
+  });
+  return cached ? cached.data : freshPromise;
 }
 
 function programRowHtml(program) {
@@ -93,14 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const filters = document.getElementById('programFilters');
   if (!container) return;
 
-  const programs = await fetchPrograms();
-  if (!programs.length) {
-    container.innerHTML = '<p style="color:var(--cream-dim);">Todavía no hay programas subidos.</p>';
-    return;
-  }
-
-  const groups = groupByProgram(programs);
-  let active = categoryFromPath(groups);
+  let groups = [];
+  let active; // undefined hasta el primer setup(): recién ahí se lee la URL
 
   function render() {
     if (filters) {
@@ -117,9 +145,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
+    if (!groups.length) {
+      container.innerHTML = '<p style="color:var(--cream-dim);">Todavía no hay programas subidos.</p>';
+      return;
+    }
+
     container.innerHTML = active === 'Todos'
       ? groups.map(([name, items]) => sectionHtml(name, items)).join('')
-      : sectionHtml(active, groups.find(([name]) => name === active)[1], { withHeader: false });
+      : sectionHtml(active, groups.find(([name]) => name === active)?.[1] ?? [], { withHeader: false });
+  }
+
+  // Se llama al instante con lo cacheado (si hay) y de nuevo cuando llega
+  // la respuesta fresca de Supabase, sin perder el filtro activo.
+  function setup(programs) {
+    groups = groupByProgram(programs);
+    if (active === undefined || (active !== 'Todos' && !groups.some(([n]) => n === active))) {
+      active = categoryFromPath(groups);
+    }
+    render();
   }
 
   window.addEventListener('popstate', () => {
@@ -127,5 +170,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     render();
   });
 
-  render();
+  setup(await fetchPrograms(setup));
 });
